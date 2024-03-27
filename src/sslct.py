@@ -255,30 +255,31 @@ class CertTree:
                 node.val.verify_directly_issued_by(issuer.val)
             except (ValueError, TypeError, InvalidSignature):
                 continue
+            break
+        else:
+            self._unverified_nodes.add(node)
+            return False
 
-            self._unverified_nodes.discard(node)
+        self._unverified_nodes.discard(node)
 
-            subject = node.val.subject.rfc4514_string()
-            if node is issuer:
-                log.debug("Self-signed certificate: %s", subject)
-                return True
-
-            if retroactive:
-                log.debug("Retroactively resolved issuer for: %s", subject)
-            else:
-                log.debug("Resolved issuer for: %s", subject)
-
-            issuer.add_child(node)
-
-            try:
-                self._unresolved_issuers[node.val.issuer].remove(node)
-            except ValueError:
-                pass
-
+        subject = node.val.subject.rfc4514_string()
+        if node is issuer:
+            log.debug("Self-signed certificate: %s", subject)
             return True
 
-        self._unverified_nodes.add(node)
-        return False
+        if retroactive:
+            log.debug("Retroactively resolved issuer for: %s", subject)
+        else:
+            log.debug("Resolved issuer for: %s", subject)
+
+        issuer.add_child(node)
+
+        try:
+            self._unresolved_issuers[node.val.issuer].remove(node)
+        except ValueError:
+            pass
+
+        return True
 
 
 @dataclass(eq=False)
