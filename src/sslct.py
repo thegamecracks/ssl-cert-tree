@@ -158,7 +158,7 @@ class CertFrame(Frame):
             parent_id,
             "end",
             id=node_id,
-            text=str(node.val.subject),
+            text=node.val.subject.rfc4514_string(),
             tags=tags,
             open=True,
         )
@@ -244,14 +244,15 @@ class CertTree:
             else:
                 self._unverified_nodes.discard(node)
 
+                subject = node.val.subject.rfc4514_string()
                 if node is issuer:
-                    log.debug("Self-signed certificate: %s", node.val.subject)
+                    log.debug("Self-signed certificate: %s", subject)
                     return True
 
                 if retroactive:
-                    log.debug("Retroactively resolved issuer for: %s", node.val.subject)
+                    log.debug("Retroactively resolved issuer for: %s", subject)
                 else:
-                    log.debug("Resolved issuer for: %s", node.val.subject)
+                    log.debug("Resolved issuer for: %s", subject)
 
                 issuer.add_child(node)
 
