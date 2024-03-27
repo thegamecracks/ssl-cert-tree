@@ -18,7 +18,7 @@ $ pip install .
 ```
 
 Once installed, the `sslct` command can be used to load certificate files
-from a given directory, or the current working directory:
+from the current working directory or a given directory:
 
 ```sh
 $ sslct examples/certifi
