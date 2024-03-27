@@ -276,7 +276,7 @@ class Node(Generic[T]):
 
     def descendants(self) -> list[Self]:
         """Return a list of descendants in breadth-first order."""
-        descendants = self.children
+        descendants = self.children.copy()
         i = 0
         while i < len(descendants):
             descendants.extend(descendants[i].children)
