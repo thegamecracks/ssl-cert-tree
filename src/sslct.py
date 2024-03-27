@@ -208,8 +208,8 @@ class CertTree:
         ]
 
     def unresolved_issuers(self) -> list[Name]:
-        """Return a list of issuer names that are required by one
-        or more certificates.
+        """Return a list of issuer names required by one or more certificates
+        which failed to be verified.
         """
         return [
             name for name, nodes in self._unresolved_issuers.items() if len(nodes) > 0
