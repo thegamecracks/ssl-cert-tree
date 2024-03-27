@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ssl-cert-tree"
+description = "An SSL certificate chain visualizer."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "thegamecracks" }]
+license = { text = "MIT" }
+classifiers = []
+dynamic = ["version"]
+dependencies = [
+    "cryptography>=42.0.5",
+]
+
+[project.scripts]
+sslct = "sslct:main"
+
+[project.urls]
+"Homepage" = "https://github.com/thegamecracks/ssl-cert-tree"
+"Issue Tracker" = "https://github.com/thegamecracks/ssl-cert-tree/issues"
+
+[tool.setuptools_scm]
