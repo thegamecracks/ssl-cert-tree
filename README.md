@@ -32,8 +32,9 @@ a missing issuer certificate, or an invalid signature.
 
 When there are CA-issued certificates, i.e. certificates that aren't self-signed,
 they will be shown under the certificate authority that issued them, forming a hierarchy.
-If you have OpenSSL installed, you can see this effect by running the example
-script to generate a set of certificates:
+If you have OpenSSL installed, you can see this effect by running the
+[example script](/examples/nested/generate_certificates.py)
+to generate a set of certificates:
 
 ```sh
 $ python examples/nested/generate_certificates.py
