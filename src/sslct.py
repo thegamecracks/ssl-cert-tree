@@ -99,6 +99,7 @@ class CertFrame(Frame):
 
         self.cert_tree = CertTree()
         self.treeview = Treeview(self, show="tree")
+        self.treeview.tag_configure("unverified", background="lightpink")
         self.treeview.grid(row=0, column=0, sticky="nesw")
 
     def find_certificates(self, directory: Path) -> None:
@@ -120,10 +121,13 @@ class CertFrame(Frame):
                 for cert in certs:
                     self.cert_tree.add(cert)
 
-        for issuer in self.cert_tree.unresolved_issuers():
-            log.warning("Unresolved issuer: %s", issuer)
-
         log.info("%d certificate(s) loaded", total)
+
+        if n_unverified := len(self.cert_tree.unverified_nodes()):
+            log.warning("%d node(s) could not be verified", n_unverified)
+
+        if n_unresolved := len(self.cert_tree.unresolved_issuers()):
+            log.warning("%d issuer(s) could not be resolved", n_unresolved)
 
     def render(self, node: Node[Certificate] | None = None) -> None:
         """Render the certificate tree."""
@@ -142,7 +146,11 @@ class CertFrame(Frame):
         else:
             parent_id = ""
 
-        self.treeview.insert(parent_id, "end", id=node_id, text=str(node.val.subject))
+        tags = []
+        if not self.cert_tree.is_verified(node):
+            tags.append("unverified")
+
+        self.treeview.insert(parent_id, "end", id=node_id, text=str(node.val.subject), tags=tags)
 
         for child in node.children:
             self.render(child)
@@ -154,10 +162,13 @@ class CertFrame(Frame):
 class CertTree:
     _subject_nodes: dict[Name, list[Node[Certificate]]]
     _unresolved_issuers: dict[Name, list[Node[Certificate]]]
+    _unverified_nodes: set[Node[Certificate]]
 
     def __init__(self, certificates: Iterable[Certificate] = ()) -> None:
         self._subject_nodes = collections.defaultdict(list)
         self._unresolved_issuers = collections.defaultdict(list)
+        self._unverified_nodes = set()
+
         for cert in certificates:
             self.add(cert)
 
@@ -179,6 +190,16 @@ class CertTree:
         return [
             name for name, nodes in self._unresolved_issuers.items() if len(nodes) > 0
         ]
+
+    def unverified_nodes(self) -> list[Node[Certificate]]:
+        """Return a list of nodes that could not be verified."""
+        return list(self._unverified_nodes)
+
+    def is_verified(self, node: Node[Certificate]) -> bool:
+        return (
+            node in self._subject_nodes[node.val.subject]
+            and node not in self._unverified_nodes
+        )
 
     def add(self, cert: Certificate) -> Node[Certificate]:
         """Add a certificate to the tree."""
@@ -210,6 +231,8 @@ class CertTree:
             except (ValueError, TypeError, InvalidSignature):
                 continue
             else:
+                self._unverified_nodes.discard(node)
+
                 if node is issuer:
                     log.debug("Self-signed certificate: %s", node.val.subject)
                     return True
@@ -228,6 +251,7 @@ class CertTree:
 
                 return True
 
+        self._unverified_nodes.add(node)
         return False
 
 
