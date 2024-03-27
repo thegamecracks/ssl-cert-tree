@@ -34,6 +34,13 @@ def main():
         help="Increase logging verbosity",
     )
     parser.add_argument(
+        "-r",
+        "--recursive",
+        action="store_true",
+        default=0,
+        help="Recursively scan directory",
+    )
+    parser.add_argument(
         "directory",
         default=".",
         help="The directory to find certificates in",
@@ -44,6 +51,7 @@ def main():
     args = parser.parse_args()
     verbose: int = args.verbose
     directory: Path = args.directory
+    recursive: bool = args.recursive
 
     configure_logging(verbose)
     enable_windows_dpi_awareness()
@@ -55,7 +63,7 @@ def main():
     app.grid_rowconfigure(0, weight=1)
 
     frame = CertFrame(app)
-    frame.find_certificates(directory)
+    frame.find_certificates(directory, recursive=recursive)
     frame.render()
     frame.grid(row=0, column=0, sticky="nesw")
 
@@ -106,13 +114,18 @@ class CertFrame(Frame):
         self.scroll.grid(row=0, column=1, sticky="ns")
         self.treeview.configure(yscrollcommand=self.scroll.set)
 
-    def find_certificates(self, directory: Path) -> None:
+    def find_certificates(self, directory: Path, *, recursive: bool = False) -> None:
         """Non-recursively search the given directory for certificates to load."""
         log.info(f"Finding certificates at directory: %s", directory)
         total = 0
 
         for pattern in CERTIFICATE_GLOB_PATTERNS:
-            for file in directory.glob(pattern):
+            if recursive:
+                matches = directory.rglob(pattern)
+            else:
+                matches = directory.glob(pattern)
+
+            for file in matches:
                 try:
                     certs = load_pem_x509_certificates(file.read_bytes())
                 except Exception:
