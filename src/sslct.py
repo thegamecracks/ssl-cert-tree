@@ -220,6 +220,7 @@ class CertTree:
         return list(self._unverified_nodes)
 
     def is_verified(self, node: Node[Certificate]) -> bool:
+        """Check if a certificate node has been verified by this tree."""
         return (
             node in self._subject_nodes[node.val.subject]
             and node not in self._unverified_nodes
