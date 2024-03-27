@@ -103,17 +103,27 @@ class CertFrame(Frame):
 
     def find_certificates(self, directory: Path) -> None:
         """Non-recursively search the given directory for certificates to load."""
-        log.debug(f"Finding certificates at directory: %s", directory)
+        log.info(f"Finding certificates at directory: %s", directory)
+        total = 0
+
         for pattern in CERTIFICATE_GLOB_PATTERNS:
             for file in directory.glob(pattern):
-                log.debug("Loading %s", file)
-                certs = load_pem_x509_certificates(file.read_bytes())
-                log.debug("Adding %d certificate(s)", len(certs))
+                try:
+                    certs = load_pem_x509_certificates(file.read_bytes())
+                except Exception:
+                    log.error("Failed to load %s", file)
+                    raise
+
+                log.debug("Loaded %s with %d certificate(s)", file, len(certs))
+                total += len(certs)
+
                 for cert in certs:
                     self.cert_tree.add(cert)
 
         for issuer in self.cert_tree.unresolved_issuers():
-            log.debug("Unresolved issuer: %s", issuer)
+            log.warning("Unresolved issuer: %s", issuer)
+
+        log.info("%d certificate(s) loaded", total)
 
     def render(self, node: Node[Certificate] | None = None) -> None:
         """Render the certificate tree."""
