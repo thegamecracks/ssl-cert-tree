@@ -154,7 +154,14 @@ class CertFrame(Frame):
         if not self.cert_tree.is_verified(node):
             tags.append("unverified")
 
-        self.treeview.insert(parent_id, "end", id=node_id, text=str(node.val.subject), tags=tags)
+        self.treeview.insert(
+            parent_id,
+            "end",
+            id=node_id,
+            text=str(node.val.subject),
+            tags=tags,
+            open=True,
+        )
 
         for child in node.children:
             self.render(child)
