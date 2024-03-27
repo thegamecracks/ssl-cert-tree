@@ -231,7 +231,7 @@ class CertTree:
         return False
 
 
-@dataclass
+@dataclass(eq=False)
 class Node(Generic[T]):
     """A node containing an abritrary value in a directed acyclic graph."""
 
