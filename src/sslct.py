@@ -7,7 +7,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from tkinter import Tk
-from tkinter.ttk import Frame, Treeview
+from tkinter.ttk import Frame, Scrollbar, Treeview
 from typing import Generic, Iterable, Self, TypeVar
 
 from cryptography.exceptions import InvalidSignature
@@ -101,6 +101,10 @@ class CertFrame(Frame):
         self.treeview = Treeview(self, show="tree")
         self.treeview.tag_configure("unverified", background="lightpink")
         self.treeview.grid(row=0, column=0, sticky="nesw")
+
+        self.scroll = Scrollbar(self, command=self.treeview.yview)
+        self.scroll.grid(row=0, column=1, sticky="ns")
+        self.treeview.configure(yscrollcommand=self.scroll.set)
 
     def find_certificates(self, directory: Path) -> None:
         """Non-recursively search the given directory for certificates to load."""
