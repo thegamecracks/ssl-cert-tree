@@ -115,7 +115,7 @@ class CertFrame(Frame):
         self.treeview.configure(yscrollcommand=self.scroll.set)
 
     def find_certificates(self, directory: Path, *, recursive: bool = False) -> None:
-        """Non-recursively search the given directory for certificates to load."""
+        """Search the given directory for certificates to load."""
         log.info(f"Finding certificates at directory: %s", directory)
         total = 0
 
