@@ -50,7 +50,7 @@ def main():
 
     app = Tk()
     app.title("SSL Certificate Tree")
-    app.geometry("600x600")
+    app.geometry("920x600")
     app.grid_columnconfigure(0, weight=1)
     app.grid_rowconfigure(0, weight=1)
 
