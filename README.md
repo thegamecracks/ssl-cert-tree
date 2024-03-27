@@ -2,6 +2,11 @@
 
 An SSL certificate chain visualizer written in Python.
 
+This uses the [cryptography] package to load and verify certificates,
+then organizes them into a tree to be presented with tkinter.
+
+[cryptography]: https://cryptography.io/en/latest/
+
 ## Usage
 
 With Python 3.11+ and Git installed, you can clone and install this repository:
